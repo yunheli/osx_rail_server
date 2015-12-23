@@ -1,7 +1,34 @@
 Rails.application.routes.draw do
   scope :api do 
      scope module: :v1 do 
-        get "/oauth/login" ,to: "users#login"
+        post "/auth/login" ,to: "users#login"
+        get  :hostname,     to: "users#hostname"
+        get  :devices,      to: "users#devices"
+        get  :platforms,    to: "users#platforms"
+        get  :ping,         to: "users#ping"
+        get  :versions,         to: "users#versions"
+        get  "/maintenance-tasks",         to: "users#maintenance_tasks"
+        post "/scm/branches", to: "users#scm_branch"
+        resources :users, only: [:show] do 
+          member do 
+            get :canCreateBots
+            get :canViewBots
+          end
+        end
+        resources :bots, only: [:index, :show, :create, :update, :delete] do 
+          member do 
+            get :integrations
+            get "/integrations/count", to: "bots#integrations_count"
+            get "/integrations/with_build_results", to: "bots#integrations_with_build_results"
+            # get "/integrations/commits", to: "bots#integrations_commits"
+            get :stats
+          end
+        end
+        resources :integrations do 
+          member do
+            get :issues
+          end
+        end
      end
   end
   # The priority is based upon order of creation: first created -> highest priority.
